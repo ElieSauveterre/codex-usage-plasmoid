@@ -1,0 +1,18 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Elie"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "Shows the remaining Codex limits included with your ChatGPT plan.",
+        "Icon": "applications-development",
+        "Id": "com.elie.codexusage",
+        "License": "MIT",
+        "Name": "Codex Usage",
+        "Version": "0.5.0"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
