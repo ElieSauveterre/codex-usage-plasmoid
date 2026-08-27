@@ -14,19 +14,15 @@ Item {
     required property string errorMessage
     required property string lastUpdatedText
     required property int resetCreditsAvailable
-    required property bool sparkAvailable
-    required property real sparkFiveHourRemaining
-    required property real sparkWeeklyRemaining
-    required property string sparkFiveHourResetText
-    required property string sparkWeeklyResetText
+    required property string resetCreditExpiryText
     signal refreshRequested()
 
     Layout.minimumWidth: 250
-    Layout.minimumHeight: 346
+    Layout.minimumHeight: implicitHeight
     Layout.preferredWidth: 260
-    Layout.preferredHeight: 356
+    Layout.preferredHeight: implicitHeight
     implicitWidth: 260
-    implicitHeight: 356
+    implicitHeight: full.resetCreditExpiryText.length > 0 ? 306 : 282
 
     Rectangle {
         anchors.fill: parent
@@ -118,48 +114,11 @@ Item {
                     value: String(full.resetCreditsAvailable)
                 }
 
-            }
-
-            Rectangle {
-                visible: full.sparkAvailable
-                Layout.fillWidth: true
-                implicitHeight: 1
-                color: "#34393e"
-            }
-
-            ColumnLayout {
-                visible: full.sparkAvailable
-                Layout.fillWidth: true
-                spacing: 4
-
-                Text {
+                MetricRow {
+                    visible: full.resetCreditExpiryText.length > 0
                     Layout.fillWidth: true
-                    color: "#d5d9dc"
-                    elide: Text.ElideRight
-                    font.pixelSize: 11
-                    font.weight: Font.Medium
-                    text: "GPT-5.3-Codex-Spark"
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: 14
-
-                    MiniLimit {
-                        Layout.fillWidth: true
-                        accentColor: full.accentColor
-                        label: qsTr("Fenêtre 5 h")
-                        remainingPercent: full.sparkFiveHourRemaining
-                        resetText: full.sparkFiveHourResetText
-                    }
-
-                    MiniLimit {
-                        Layout.fillWidth: true
-                        accentColor: full.accentColor
-                        label: qsTr("Semaine")
-                        remainingPercent: full.sparkWeeklyRemaining
-                        resetText: full.sparkWeeklyResetText
-                    }
+                    label: qsTr("À utiliser avant")
+                    value: full.resetCreditExpiryText
                 }
             }
 

@@ -15,11 +15,7 @@ PlasmoidItem {
     property string errorMessage: ""
     property string lastUpdatedText: ""
     property int resetCreditsAvailable: 0
-    property bool sparkAvailable: false
-    property real sparkFiveHourRemaining: 0
-    property real sparkWeeklyRemaining: 0
-    property string sparkFiveHourResetText: ""
-    property string sparkWeeklyResetText: ""
+    property string resetCreditExpiryText: ""
     property string activeCommand: ""
 
     Plasmoid.backgroundHints: PlasmaCore.Types.NoBackground
@@ -52,11 +48,7 @@ PlasmoidItem {
         errorMessage: root.errorMessage
         lastUpdatedText: root.lastUpdatedText
         resetCreditsAvailable: root.resetCreditsAvailable
-        sparkAvailable: root.sparkAvailable
-        sparkFiveHourRemaining: root.sparkFiveHourRemaining
-        sparkWeeklyRemaining: root.sparkWeeklyRemaining
-        sparkFiveHourResetText: root.sparkFiveHourResetText
-        sparkWeeklyResetText: root.sparkWeeklyResetText
+        resetCreditExpiryText: root.resetCreditExpiryText
         onRefreshRequested: root.refresh()
     }
 
@@ -136,6 +128,14 @@ PlasmoidItem {
         return date.toLocaleString(Qt.locale(), "ddd HH:mm")
     }
 
+    function deadlineLabel(timestamp) {
+        if (!timestamp) {
+            return ""
+        }
+        const date = new Date(timestamp * 1000)
+        return date.toLocaleString(Qt.locale(), "d MMM HH:mm")
+    }
+
     function applyPayload(payload) {
         const general = findLimit(payload, "codex") || payload.limits[0]
         const primary = general.primary || general.secondary
@@ -144,18 +144,8 @@ PlasmoidItem {
         weeklyResetText = resetLabel(primary.resetsAt)
         planLabel = general.planType ? general.planType.toUpperCase() : ""
         resetCreditsAvailable = payload.resetCreditsAvailable || 0
+        resetCreditExpiryText = deadlineLabel(payload.nextResetCreditExpiresAt)
         errorMessage = ""
-
-        const spark = findLimit(payload, "codex_bengalfox")
-        sparkAvailable = spark !== null
-        if (spark) {
-            const fiveHour = spark.primary
-            const weekly = spark.secondary
-            sparkFiveHourRemaining = fiveHour ? fiveHour.remainingPercent : 0
-            sparkWeeklyRemaining = weekly ? weekly.remainingPercent : 0
-            sparkFiveHourResetText = fiveHour ? resetLabel(fiveHour.resetsAt) : ""
-            sparkWeeklyResetText = weekly ? resetLabel(weekly.resetsAt) : ""
-        }
 
         const updated = new Date(payload.updatedAt * 1000)
         lastUpdatedText = qsTr("Actualisé à %1").arg(updated.toLocaleTimeString(Qt.locale(), "HH:mm"))

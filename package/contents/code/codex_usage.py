@@ -54,6 +54,32 @@ def sanitized_limit(limit_id: str, raw: Any) -> dict[str, Any] | None:
     }
 
 
+def nearest_reset_credit_expiry(raw: Any) -> int | None:
+    if not isinstance(raw, dict):
+        return None
+
+    credits = raw.get("credits")
+    if not isinstance(credits, list):
+        return None
+
+    expiries = []
+    for credit in credits:
+        if not isinstance(credit, dict):
+            continue
+        if credit.get("status") not in (None, "available"):
+            continue
+
+        expires_at = credit.get("expiresAt")
+        if (
+            isinstance(expires_at, (int, float))
+            and not isinstance(expires_at, bool)
+            and expires_at > 0
+        ):
+            expiries.append(int(expires_at))
+
+    return min(expiries) if expiries else None
+
+
 def read_limits(timeout_seconds: float) -> dict[str, Any]:
     codex_binary = os.environ.get("CODEX_BIN") or shutil.which("codex")
     if not codex_binary:
@@ -143,6 +169,7 @@ def read_limits(timeout_seconds: float) -> dict[str, Any]:
                 "updatedAt": int(time.time()),
                 "limits": limits,
                 "resetCreditsAvailable": int(reset_credits.get("availableCount") or 0),
+                "nextResetCreditExpiresAt": nearest_reset_credit_expiry(reset_credits),
             }
 
         raise RuntimeError("Délai dépassé en attendant les limites Codex")
